@@ -25,7 +25,7 @@ class Bio(BaseModel):
         None, 
         description="His country of origin, not necessarily where he grew up, but what defines his or her ethnicity."
     )
-    birth_city: Optional[str] = Optional[str] = Field(
+    birth_city: Optional[str] = Field(
         None, 
         description="The city where he or she was born."
     )
