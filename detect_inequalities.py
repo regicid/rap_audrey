@@ -34,7 +34,7 @@ except Exception as e:
     exit(1)
 
 # --- 3. INITIALIZE LLM ---
-model_name = "mistralai/Magistral-Small-2506"
+model_name = "openai/gpt-oss-20b"
 llm = LLM(
     model=model_name,
     enforce_eager=True,
