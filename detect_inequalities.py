@@ -34,7 +34,7 @@ except Exception as e:
     exit(1)
 
 # --- 3. INITIALIZE LLM ---
-model_name = "openai/gpt-oss-20b"
+model_name = "mistralai/Magistral-Small-2506"
 llm = LLM(
     model=model_name,
     enforce_eager=True,
@@ -50,7 +50,7 @@ structured_outputs_params = StructuredOutputsParams(
 
 sampling_params = SamplingParams(
     temperature=0.0,
-    max_tokens=8192,
+    max_tokens=1024,
     structured_outputs=structured_outputs_params # Updated parameter
 )
 
