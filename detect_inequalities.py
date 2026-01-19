@@ -34,7 +34,7 @@ except Exception as e:
     exit(1)
 
 # --- 3. INITIALIZE LLM ---
-model_name = "Qwen3-Next-80B-A3B-Instruct-FP8"
+model_name = "Qwen/Qwen3-Next-80B-A3B-Instruct-FP8"
 llm = LLM(
     model=model_name,
     tensor_parallel_size=2,
