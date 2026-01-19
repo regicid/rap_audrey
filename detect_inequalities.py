@@ -34,11 +34,12 @@ except Exception as e:
     exit(1)
 
 # --- 3. INITIALIZE LLM ---
-model_name = "mistralai/Magistral-Small-2506"
+model_name = "Qwen3-Next-80B-A3B-Instruct-FP8"
 llm = LLM(
     model=model_name,
+    tensor_parallel_size=2,
     enforce_eager=True,
-    max_model_len=4096,
+    max_model_len=8192,
     gpu_memory_utilization=0.98
 )
 
@@ -94,10 +95,11 @@ le thème général du morceau. Si c'est pertinent, utilise ce thème pour justi
 
         - "inégalités des chances" :inégalités liées au milieu social, à la pauvreté, à l’accès à l’éducation, au travail ou aux ressources.
 
-         ### CRITÈRES D'EXCLUSION (CE QU'IL NE FAUT PAS ANNOTER) :
-- La souffrance personnelle vague : "Je suis triste", "J'erre sans but", "Je suis seul". Ce sont des émotions, pas des inégalités sociales. N'annote que si la souffrance est reliée à une cause sociale (ex: "Je suis triste car je n'ai pas de papiers").
-- La sexualité explicite consensuelle : Décrire un acte sexuel n'est pas une "inégalité de genre" sauf si le vocabulaire est dégradant, violent ou force la soumission.
-- La simple mention des catégories : Dire "les hommes et les femmes" n'est pas une reproduction d'inégalité.
+         # CRITÈRES D'EXCLUSION (CE QU'IL NE FAUT PAS ANNOTER) :
+            - La souffrance personnelle vague : "Je suis triste", "J'erre sans but", "Je suis seul". Ce sont des émotions, pas des inégalités sociales. N'annote que si la souffrance est reliée à une cause sociale (ex: "Je suis triste car je n'ai pas de papiers").
+            - La sexualité explicite consensuelle : Décrire un acte sexuel n'est pas une "inégalité de genre" sauf si le vocabulaire est dégradant, violent ou force la soumission.
+            - La simple mention des catégories : Dire "les hommes et les femmes" n'est pas une reproduction d'inégalité. Idem sur les "nègres".
+
         """},
         {"role": "user", "content": f"Paroles :\n{song_text}"}
     ]
