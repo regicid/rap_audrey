@@ -50,7 +50,7 @@ structured_outputs_params = StructuredOutputsParams(
 
 sampling_params = SamplingParams(
     temperature=0.0,
-    max_tokens=1024,
+    max_tokens=8192,
     structured_outputs=structured_outputs_params # Updated parameter
 )
 
