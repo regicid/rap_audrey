@@ -72,10 +72,8 @@ Here is the content: {text}<|im_end|>
 files = os.listdir("lemonde_update/")
 
 prompts = []
-for file in tqdm(files):
-    with open("lemonde_update/" + file, "r") as f:  # Better file handling
-        text = f.read()
-    prompts.append(prompter(text))
+for r in tqdm(rappeurs.bio.values):
+    prompts.append(prompter(r))
 
 outputs = llm.generate(prompts, sampling_params)
 
