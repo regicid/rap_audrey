@@ -3,16 +3,14 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from datetime import date
-import sys
-new_model_name = "NousResearch/Hermes-4-14B"
+import json  # Missing import
+from pydantic import BaseModel, Field  # Added Field
+from typing import List, Optional, Literal
 
+new_model_name = "NousResearch/Hermes-4-14B"
 llm = LLM(new_model_name)
 sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=1000)
-
 rappeurs = pd.read_csv("rappeurs_bio.csv")
-
-from pydantic import BaseModel
-from typing import List, Optional, Literal
 
 class Bio(BaseModel):
     date_of_birth: Optional[date] = Field(
@@ -41,13 +39,12 @@ class Bio(BaseModel):
         None,
         description="Gender of the rapper: 'men' or 'women'"
     )
-    education_level: Optional[str] = Optional[str] = Field(
+    education_level: Optional[str] = Field(
         None, 
         description="The education level of the rapper: whether he or she finished highschool (baccalauréat in France), and any university stuff he did. If it is not mentioned, put None. If it is mentioned that he did not study or did not finish highschool, mention it here."
     ) 
 
-schema = Bio.schema_json()
-
+schema = Bio.model_json_schema()  # Changed from schema_json()
 
 def prompter(text):
     tool_definition = {
@@ -55,32 +52,36 @@ def prompter(text):
         "function": {
             "name": "annotate_biographies",
             "description": "You extract infos about French rappers from their biographies and output a structured format.",
-            "parameters": schema  # Your Pydantic schema converted to JSON Schema
+            "parameters": schema
         }
     }
     
     prompt = f"""<|im_start|>system
-        You are the annotator of French rappers biographies.
-        <tools>
-        {json.dumps(tool_definition)}
-        </tools><|im_end|>
-        <|im_start|>user
-        Extract informations from this biography of a French rapper. If the informations are not present, put NA or an empty string. 
-        Here is the content: {text}<|im_end|>
-        <|im_start|>assistant
-        """
+You are the annotator of French rappers biographies.
+<tools>
+{json.dumps(tool_definition)}
+</tools><|im_end|>
+<|im_start|>user
+Extract informations from this biography of a French rapper. If the informations are not present, put NA or an empty string. 
+Here is the content: {text}<|im_end|>
+<|im_start|>assistant
+"""
     return prompt
+
+# Define files - this was missing!
+files = os.listdir("lemonde_update/")
 
 prompts = []
 for file in tqdm(files):
-    file = open("lemonde_update/"+file,"r")
-    text = file.read()
-    file.close()
+    with open("lemonde_update/" + file, "r") as f:  # Better file handling
+        text = f.read()
     prompts.append(prompter(text))
 
 outputs = llm.generate(prompts, sampling_params)
 
-rappeurs["bio_json"] = outputs
+# Extract actual text from outputs
+bio_results = [output.outputs[0].text for output in outputs]
+rappeurs["bio_json"] = bio_results
 
-
-rappeurs.to_csv(f"rappeurs_bio.csv")
+# Save to different file to avoid overwriting
+rappeurs.to_csv("rappeurs_bio_annotated.csv", index=False)
