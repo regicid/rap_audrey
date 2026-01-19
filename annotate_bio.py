@@ -10,7 +10,7 @@ from typing import List, Optional, Literal
 new_model_name = "NousResearch/Hermes-4-14B"
 llm = LLM(new_model_name)
 sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=1000)
-rappeurs = pd.read_csv("rappeurs_bio.csv")
+rappeurs = pd.read_csv("/home/decourson/rap_audrey/rappeurs_bio.csv")
 
 class Bio(BaseModel):
     date_of_birth: Optional[date] = Field(
