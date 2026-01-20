@@ -41,9 +41,10 @@ def main():
     llm = LLM(
         model=model_name,
         tensor_parallel_size=2,
+        use_v1=False,
         enforce_eager=True,
         max_model_len=8192,
-        gpu_memory_utilization=0.98
+        gpu_memory_utilization=0.95
     )
     
     # --- 3. CONFIGURE STRUCTURED OUTPUT ---
