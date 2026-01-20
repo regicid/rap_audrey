@@ -1,3 +1,7 @@
+# Add this at the VERY TOP of your script, before any other imports
+import multiprocessing
+multiprocessing.set_start_method('spawn', force=True)
+
 import os
 import pandas as pd
 import json
