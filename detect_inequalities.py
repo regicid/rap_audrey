@@ -6,35 +6,33 @@ from pydantic import BaseModel
 
 # 1. Environment and vLLM Imports
 os.environ["VLLM_USE_V1"] = "1"
-
 from vllm import LLM, SamplingParams
-from vllm.sampling_params import StructuredOutputsParams # New import for v0.13.0+
+from vllm.sampling_params import StructuredOutputsParams
 
 # --- 1. DEFINE OUTPUT SCHEMA ---
 class InequalityMention(BaseModel):
     lines: str
     type: Literal["inégalités des chances", "inégalités raciales", "inégalités de genre", "autre"]
-    stance: Literal[
-        "reproduction", "dénonciation", "constat"   # the text criticizes / exposes the inequality
-    ]
+    stance: Literal["reproduction", "dénonciation", "constat"]
     justification: str
     confidence: Literal["faible", "moyenne", "élevée"]
 
 class InequalityAnalysis(BaseModel):
     mentions: List[InequalityMention]
 
-# --- 2. LOAD & SAMPLE DATA ---
-try:
-    print("Loading dataset...")
-    df = pd.read_csv("hf://datasets/regicid/LRFAF/corpus.csv")
-    df_sample = df.sample(n=min(100, len(df)), random_state=42)
-    print(f"Dataset loaded. Processing {len(df_sample)} songs.")
-except Exception as e:
-    print(f"Error: {e}")
-    exit(1)
-
-# --- 3. INITIALIZE LLM ---
+# --- 2. MAIN FUNCTION ---
 def main():
+    # Load dataset
+    try:
+        print("Loading dataset...")
+        df = pd.read_csv("hf://datasets/regicid/LRFAF/corpus.csv")
+        df_sample = df.sample(n=min(100, len(df)), random_state=42)
+        print(f"Dataset loaded. Processing {len(df_sample)} songs.")
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
+    
+    # Initialize LLM
     model_name = "Qwen/Qwen3-Next-80B-A3B-Instruct-FP8"
     llm = LLM(
         model=model_name,
@@ -44,7 +42,13 @@ def main():
         gpu_memory_utilization=0.98
     )
     
-    # ... rest of your code ...
+    # ALL your processing code goes here
+    # Including the line that was causing the error (line 115)
+    print("Starting sequential analysis...")
+    
+    # ... rest of your analysis code ...
+    # prompt_token_ids = llm.get_tokenizer().apply_chat_template(...)
+    # etc.
 
 if __name__ == '__main__':
     main()
