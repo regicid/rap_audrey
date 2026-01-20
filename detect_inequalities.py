@@ -65,4 +65,72 @@ def main():
             continue
 
         messages = [
-            {"role": "system", "con
+            {"role": "system", "content": """
+            Tu es un annotateur expert. Analyse les inégalités dans les paroles et réponds en JSON. N'invente rien. Ne crée une entrée dans 'mentions' que lorsqu'une inégalité est clairement et explicitement exprimée dans le texte. S'il n'y a aucune inégalité explicite dans le morceau, retourne 'mentions': []. N'ajoute pas d'entrées pour expliquer l'absence d'inégalités. Dans la justification, explique le lien avec le contexte global
+    du morceau ou avec les lignes précédentes lorsque c'est pertinent. Avant d'annoter des lignes individuelles, identifie mentalement
+    le thème général du morceau. Si c'est pertinent, utilise ce thème pour justifier les mentions.
+
+            Pour chaque mention :
+            - indique le type d'inégalité
+            - indique la stance 
+            - indique un niveau de confidence :
+              * "élevée", "moyenne", ou "faible"
+
+            Définition de la stance :
+            - "reproduction" : le texte reprend, normalise ou valorise une inégalité sans distance critique.
+
+            - "constat" :
+              le texte constate l'existence d'une inégalité ou d'une situation injuste sans l'approuver ni la condamner explicitement.
+
+            - "dénonciation" :
+              le texte critique l'inégalité, la condamne ou en souligne l'injustice.
+
+            Définitions des types d'inégalités :
+
+            - "inégalités de genre" : différences de traitement, de statut ou de valeur explicitement liées au sexe ou au genre (femmes, hommes, rôles genrés, sexisme).
+
+            - "inégalités raciales" : discriminations ou hiérarchies fondées sur l'origine ethnique, la couleur de peau, la nationalité ou la race.
+
+            - "inégalités des chances" :inégalités liées au milieu social, à la pauvreté, à l'accès à l'éducation, au travail ou aux ressources.
+
+             # CRITÈRES D'EXCLUSION (CE QU'IL NE FAUT PAS ANNOTER) :
+                - La souffrance personnelle vague : "Je suis triste", "J'erre sans but", "Je suis seul". Ce sont des émotions, pas des inégalités sociales. N'annote que si la souffrance est reliée à une cause sociale (ex: "Je suis triste car je n'ai pas de papiers").
+                - La sexualité explicite consensuelle : Décrire un acte sexuel n'est pas une "inégalité de genre" sauf si le vocabulaire est dégradant, violent ou force la soumission.
+                - La simple mention des catégories : Dire "les hommes et les femmes" n'est pas une reproduction d'inégalité. Idem sur les "nègres".
+
+            """},
+            {"role": "user", "content": f"Paroles :\n{song_text}"}
+        ]
+
+        # Use the tokenizer directly to avoid the 'unsafe' warning
+        prompt_token_ids = llm.get_tokenizer().apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=True
+        )
+
+        try:
+            # We pass prompt_token_ids instead of a string
+            outputs = llm.generate(
+                [{"prompt_token_ids": prompt_token_ids}],
+                sampling_params=sampling_params
+            )
+     
+            generated_text = outputs[0].outputs[0].text
+            print(generated_text)
+            results.append({
+                "index": index,
+                "analysis": json.loads(generated_text)
+            })
+            print(f"[{i+1}/100] Song {index} analyzed.")
+        except Exception as e:
+            print(f"Error at index {index}: {e}")
+
+    # --- 5. SAVE ---
+    with open("results.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+    print("Finished. Results saved to results.json.")
+
+if __name__ == '__main__':
+    main()
