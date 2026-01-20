@@ -9,7 +9,7 @@ from typing import List, Literal
 from pydantic import BaseModel
 
 # 1. Environment and vLLM Imports
-os.environ["VLLM_USE_V1"] = "1"
+os.environ["VLLM_USE_V1"] = "0"
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import StructuredOutputsParams
 
