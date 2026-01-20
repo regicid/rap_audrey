@@ -34,14 +34,20 @@ except Exception as e:
     exit(1)
 
 # --- 3. INITIALIZE LLM ---
-model_name = "Qwen/Qwen3-Next-80B-A3B-Instruct-FP8"
-llm = LLM(
-    model=model_name,
-    tensor_parallel_size=2,
-    enforce_eager=True,
-    max_model_len=8192,
-    gpu_memory_utilization=0.98
-)
+def main():
+    model_name = "Qwen/Qwen3-Next-80B-A3B-Instruct-FP8"
+    llm = LLM(
+        model=model_name,
+        tensor_parallel_size=2,
+        enforce_eager=True,
+        max_model_len=8192,
+        gpu_memory_utilization=0.98
+    )
+    
+    # ... rest of your code ...
+
+if __name__ == '__main__':
+    main()
 
 # --- 4. CONFIGURE STRUCTURED OUTPUT ---
 # This is the updated syntax for v0.12.0 and later
